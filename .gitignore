@@ -1,0 +1,30 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+.env
+
+# Java
+*.class
+*.jar
+target/
+.classpath
+.project
+.settings/
+
+# IntelliJ
+.idea/
+*.iml
+out/
+
+# Output Files
+outputs/
+output/
+*.mp4
+*.pdf
+*.txt
+*.png
+*.gif
+*.csv
+
+*.bat
