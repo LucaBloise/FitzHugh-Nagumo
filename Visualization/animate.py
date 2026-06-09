@@ -206,6 +206,22 @@ def build_animation_full(times, vs, ws, meta, fps, max_frames, skip):
     ax_net.set_aspect("equal")
     ax_net.axis("off")
 
+    # Dibujar aristas solo para redes pequeñas
+    if N <= 30:
+        full_edges = []
+        for i in range(N):
+            for j in range(i + 1, N):
+                full_edges.append((i, j))
+
+        segs = _edge_segments(pos, full_edges)
+        lc = LineCollection(
+            segs,
+            colors="#2a2a2a",
+            linewidths=0.5,
+            zorder=1
+        )
+        ax_net.add_collection(lc)
+
     sc = ax_net.scatter(
         pos[:, 0], pos[:, 1],
         c=vs[frames_idx[0]], cmap=CMAP, norm=norm,

@@ -58,9 +58,6 @@ public class SimulationConfig {
                 default -> throw new IllegalArgumentException("Unknown option: --" + key);
             }
         }
-        if (c.n <= 500) {
-            throw new IllegalArgumentException("N must be > 500 (enunciado), got " + c.n);
-        }
         if (!c.outputPathExplicit) {
             c.outputPath = OutputFileName.buildDefault(c);
         }
