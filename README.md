@@ -174,3 +174,31 @@ Notas de CSV:
 - `--csv-mode use`: usa solo el CSV existente.
 - `--threads`: cantidad de threads para parsear outputs al recalcular (`0` = automatico).
 - El CSV guarda solo datos agregados necesarios para graficar por cada `K` y tiempo: `k,time,mean_v,std_v,n_reps`.
+
+## 6) Punto 3: evolucion temporal de la dispersion espacial sigma_v(t)
+
+Para estudiar sigma_v(t) y promediar sobre varias realizaciones por cada `K`:
+
+```bash
+python Visualization/plot_sigma_v.py --csv Visualization/sigma_v_cache.csv --csv-mode recompute --threads 0 --save Visualization/sigma_v_vs_time.png
+```
+
+Uso con cache existente (sin reparsear outputs):
+
+```bash
+python Visualization/plot_sigma_v.py --csv Visualization/sigma_v_cache.csv --csv-mode use --save Visualization/sigma_v_vs_time.png
+```
+
+Filtrar y usar solo ciertos valores de `K`:
+
+```bash
+python Visualization/plot_sigma_v.py --csv Visualization/sigma_v_cache.csv --csv-mode recompute --k-values 0.2 0.4 0.6 0.8 1.0 --save Visualization/sigma_v_vs_time.png
+```
+
+Este script:
+
+- Lee corridas desde `Simulation/output/`.
+- Calcula `sigma_v(t)` por realizacion (desvio estandar espacial sobre neuronas).
+- Agrupa por `K` y promedia entre realizaciones.
+- Guarda CSV compacto con: `k,time,mean_sigma_v,std_sigma_v,n_reps`.
+- Permite filtrar por valores especificos de `K` con `--k-values`.
