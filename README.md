@@ -202,3 +202,34 @@ Este script:
 - Agrupa por `K` y promedia entre realizaciones.
 - Guarda CSV compacto con: `k,time,mean_sigma_v,std_sigma_v,n_reps`.
 - Permite filtrar por valores especificos de `K` con `--k-values`.
+
+## 7) Punto 4: tiempo de sincronizacion y sigma estacionaria vs K
+
+Para calcular `t_sync` por realizacion, agregar por `K`, y graficar resultados:
+
+```bash
+python3.13 Visualization/analyze_sigma_sync.py --csv Visualization/sigma_v_cache.csv
+```
+
+El script genera:
+
+- `Visualization/sync_time_vs_K.png`
+- `Visualization/stationary_sigma_vs_K.png`
+- `Visualization/stationary_sigma_vs_K.csv`
+
+Opciones utiles:
+
+```bash
+# si no sincroniza, usar t_max en vez de NaN
+python3.13 Visualization/analyze_sigma_sync.py --csv Visualization/sigma_v_cache.csv --sync-fill tmax
+
+# cambiar rutas de salida
+python3.13 Visualization/analyze_sigma_sync.py --csv Visualization/sigma_v_cache.csv --out-sync Visualization/sync_time_vs_K.png --out-stationary Visualization/stationary_sigma_vs_K.png --out-csv Visualization/stationary_sigma_vs_K.csv
+```
+
+Notas:
+
+- Si el CSV ya tiene formato por realizacion (`k,time,realization,sigma_v`), usa ese CSV directamente.
+- Si el CSV es agregado por `K` (`k,time,mean_sigma_v,std_sigma_v,n_reps`), reconstruye realizaciones parseando `Simulation/output/`.
+- `--sigma-threshold` define el epsilon para deteccion de sincronizacion (default actual: `1e-7`).
+
