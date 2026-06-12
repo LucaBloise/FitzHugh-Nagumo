@@ -53,7 +53,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--repetitions", type=int, required=True)
     parser.add_argument("--n", type=int, default=512)
     parser.add_argument("--dt", type=float, default=0.005)
-    parser.add_argument("--tmax", type=float, default=500.0)
+    parser.add_argument("--tmax", type=float, default=1000.0)
 
     parser.add_argument(
         "--network",
