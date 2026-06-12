@@ -298,8 +298,7 @@ def plot_sigma_vs_ring_k(x: np.ndarray, y: np.ndarray, yerr: np.ndarray,
     )
     ax.set_xlabel(r"Vecinos por lado $k$", fontsize=15)
     ax.set_ylabel(
-        #r"Dispersión espacial $\langle \sigma_{v} \rangle_{est}$",
-        r"Dispersión espacial \sigma_{v}$",
+        r"Dispersión espacial promedio $\langle \sigma_{v} \rangle$",
         fontsize=15,
     )
     ax.set_xticks(x)

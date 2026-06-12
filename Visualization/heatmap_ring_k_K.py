@@ -332,6 +332,7 @@ def main() -> None:
         stat_mat,
         r"Dispersión espacial promedio $\langle \sigma_{v} \rangle_{est}$",
         out_dir / "stationary_sigma_heatmap_ring_k_K.png",
+        annotate=False,
     )
     plot_heatmap(
         k_vals,
@@ -339,6 +340,7 @@ def main() -> None:
         stationary_time_mat,
         r"Tiempo de llegada al estacionario promedio $t_{est}$ (s)",
         out_dir / "stationary_time_heatmap_ring_k_K.png",
+        annotate=False,
     )
     plot_heatmap(
         k_vals,
@@ -355,6 +357,7 @@ def main() -> None:
         mean_v_mat,
         r"Potencial promedio estacionario $\langle v \rangle_{est}$",
         out_dir / "stationary_mean_v_heatmap_ring_k_K.png",
+        annotate=False,
     )
 
     print(f"Analyzed {sum(len(v) for v in grouped.values())} runs in {len(rows)} grid cells.")
