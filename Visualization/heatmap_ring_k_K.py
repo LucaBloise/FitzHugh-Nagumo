@@ -53,19 +53,19 @@ def parse_args() -> argparse.Namespace:
                         help="Optional K values to include")
     parser.add_argument("--ring-k-values", type=int, nargs="*", default=None,
                         help="Optional ring_k values to include")
-    parser.add_argument("--k-tol", type=float, default=1e-12,
+    parser.add_argument("--k-tol", type=float, default=1e-8,
                         help="Tolerance for matching requested K values")
-    parser.add_argument("--stationary-fraction", type=float, default=0.2,
+    parser.add_argument("--stationary-fraction", type=float, default=0.25,
                         help="Final fraction used for stationary averages")
-    parser.add_argument("--stationary-window", type=int, default=40,
+    parser.add_argument("--stationary-window", type=int, default=20,
                         help="Stored-sample window used to detect arrival to stationary regime")
-    parser.add_argument("--stationary-epsilon", type=float, default=2e-3,
+    parser.add_argument("--stationary-epsilon", type=float, default=0.005,
                         help="Max-min tolerance of sigma_v inside the stationary detection window")
     parser.add_argument("--stationary-fill", choices=["nan", "tmax"], default="nan",
                         help="Value if a run never satisfies stationary-window criterion")
-    parser.add_argument("--sigma-threshold", type=float, default=1e-2,
+    parser.add_argument("--sigma-threshold", type=float, default=0.01,
                         help="Synchronization threshold for sigma_v(t)")
-    parser.add_argument("--sync-window", type=int, default=20,
+    parser.add_argument("--sync-window", type=int, default=15,
                         help="Require sigma below threshold for this many consecutive stored samples")
     parser.add_argument("--sync-fill", choices=["nan", "tmax"], default="nan",
                         help="Value if a run never reaches the synchronization threshold")
