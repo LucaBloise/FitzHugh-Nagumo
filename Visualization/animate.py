@@ -131,6 +131,17 @@ def circular_positions(n: int):
     return np.column_stack([np.cos(angles), np.sin(angles)])
 
 
+def grid_positions(n: int):
+    cols = int(np.ceil(np.sqrt(n)))
+    rows = int(np.ceil(n / cols))
+
+    x = np.linspace(-1.0, 1.0, cols)
+    y = np.linspace(1.0, -1.0, rows)
+    xx, yy = np.meshgrid(x, y)
+    pos = np.column_stack([xx.ravel(), yy.ravel()])
+    return pos[:n]
+
+
 def spring_positions(n: int, edges, seed: int = 0):
     """Diseño simple dirigido por fuerzas (sin dependencia de networkx)."""
     rng = np.random.default_rng(seed)
@@ -181,6 +192,72 @@ def _edge_segments(pos, edges):
     return [np.array([pos[i], pos[j]]) for i, j in edges]
 
 
+def build_animation_grid(times, vs, ws, meta, fps, max_frames, skip):
+    """
+    Vista alternativa: nodos en grilla con tamaño grande para resaltar variaciones.
+    """
+    N = vs.shape[1]
+    frames_idx = list(range(0, len(times), skip))
+    if max_frames:
+        frames_idx = frames_idx[:max_frames]
+
+    pos = grid_positions(N)
+
+    v_all = vs[np.array(frames_idx)]
+    vmin, vmax = v_all.min(), v_all.max()
+    norm = Normalize(vmin=vmin, vmax=vmax)
+
+    fig = plt.figure(figsize=(8, 8), facecolor="#0d0d0d")
+    ax_net = fig.add_axes([0.05, 0.05, 0.85, 0.82], facecolor="#0d0d0d")
+
+    ax_net.set_xlim(-1.1, 1.1)
+    ax_net.set_ylim(-1.1, 1.1)
+    ax_net.set_aspect("equal")
+    ax_net.axis("off")
+
+    node_size = max(60, 32000 // max(N, 1))
+    sc = ax_net.scatter(
+        pos[:, 0], pos[:, 1],
+        c=vs[frames_idx[0]], cmap=CMAP, norm=norm,
+        s=node_size, zorder=3, linewidths=0,
+    )
+
+    cbar = fig.colorbar(sc, ax=ax_net, fraction=0.04, pad=0.02)
+    cbar.set_label("Potencial de membrana $v_i$", color="white", fontsize=9)
+    cbar.ax.yaxis.set_tick_params(color="white")
+    plt.setp(cbar.ax.yaxis.get_ticklabels(), color="white")
+
+    network = meta.get("network", "?")
+    K_val = float(meta["K"]) if "K" in meta else None
+    K_str = f"{K_val:g}" if K_val is not None else "?"
+
+    fig.text(0.5, 0.97, "FitzHugh–Nagumo  |  Vista en Grilla (Nodos Grandes)",
+             color="white", fontsize=12, ha="center", va="top")
+    fig.text(0.5, 0.93, f"network={network}, N={N}, K={K_str}",
+             color="#aaaaaa", fontsize=10, ha="center", va="top")
+
+    time_text = fig.text(
+        0.5, 0.89, f"t = {times[frames_idx[0]]:.2f} s",
+        color="#ffd54f", fontsize=13, fontweight="bold",
+        ha="center", va="top", family="monospace",
+    )
+
+    def init():
+        return (sc, time_text)
+
+    def update(frame_num):
+        fi = frames_idx[frame_num]
+        sc.set_array(vs[fi])
+        time_text.set_text(f"t = {times[fi]:.2f} s")
+        return (sc, time_text)
+
+    ani = animation.FuncAnimation(
+        fig, update, frames=len(frames_idx), init_func=init,
+        interval=1000 / fps, blit=False,
+    )
+    return fig, ani
+
+
 def build_animation_full(times, vs, ws, meta, fps, max_frames, skip):
     """
     Red FULL: diseño circular, nodos coloreados por v_i.
@@ -225,7 +302,7 @@ def build_animation_full(times, vs, ws, meta, fps, max_frames, skip):
     sc = ax_net.scatter(
         pos[:, 0], pos[:, 1],
         c=vs[frames_idx[0]], cmap=CMAP, norm=norm,
-        s=max(2, 400 // N), zorder=3, linewidths=0,
+        s=max(4, 700 // N), zorder=3, linewidths=0,
     )
     cbar = fig.colorbar(sc, ax=ax_net, fraction=0.04, pad=0.02)
     cbar.set_label("Potencial de membrana $v_i$", color="white", fontsize=9)
@@ -254,6 +331,13 @@ def build_animation_full(times, vs, ws, meta, fps, max_frames, skip):
 
     def update(frame_num):
         fi = frames_idx[frame_num]
+        if frame_num % 50 == 0:
+            print(
+                times[fi],
+                np.min(vs[fi]),
+                np.max(vs[fi]),
+                np.std(vs[fi])
+            )
         sc.set_array(vs[fi])
         time_text.set_text(f"t = {times[fi]:.2f} s")
         return (sc, time_text)
@@ -307,7 +391,7 @@ def build_animation_random(times, vs, ws, meta, edges, fps, max_frames, skip):
     sc = ax_net.scatter(
         pos[:, 0], pos[:, 1],
         c=vs[frames_idx[0]], cmap=CMAP, norm=norm,
-        s=max(4, 300 // N), zorder=3, linewidths=0,
+        s=max(7, 520 // N), zorder=3, linewidths=0,
     )
     cbar = fig.colorbar(sc, ax=ax_net, fraction=0.04, pad=0.02)
     cbar.set_label("Potencial de membrana $v_i$", color="white", fontsize=9)
@@ -338,6 +422,13 @@ def build_animation_random(times, vs, ws, meta, edges, fps, max_frames, skip):
 
     def update(frame_num):
         fi = frames_idx[frame_num]
+        if frame_num % 50 == 0:
+            print(
+                times[fi],
+                np.min(vs[fi]),
+                np.max(vs[fi]),
+                np.std(vs[fi])
+            )
         sc.set_array(vs[fi])
         time_text.set_text(f"t = {times[fi]:.2f} s")
         return (sc, time_text)
@@ -389,7 +480,7 @@ def build_animation_ring(times, vs, ws, meta, edges, fps, max_frames, skip):
         ax_net.add_collection(lc)
 
     # OPTIMIZACIÓN VISUAL: Ajustar el tamaño del nodo según N
-    node_size = max(2, 1500 // N) if N > 100 else 40
+    node_size = max(4, 2600 // N) if N > 100 else 60
 
     sc = ax_net.scatter(
         pos[:, 0], pos[:, 1],
@@ -421,6 +512,13 @@ def build_animation_ring(times, vs, ws, meta, edges, fps, max_frames, skip):
 
     def update(frame_num):
         fi = frames_idx[frame_num]
+        if frame_num % 50 == 0:
+            print(
+                times[fi],
+                np.min(vs[fi]),
+                np.max(vs[fi]),
+                np.std(vs[fi])
+            )
         sc.set_array(vs[fi])
         time_text.set_text(f"t = {times[fi]:.2f} s")
         return sc, time_text
@@ -475,6 +573,11 @@ def main():
         "--skip", type=int, default=1, metavar="K",
         help="Usa 1 de cada K cuadros guardados (por defecto 1 = todos los cuadros).",
     )
+    parser.add_argument(
+        "--grid-layout",
+        action="store_true",
+        help="Usa una vista alternativa en grilla con nodos mucho mas grandes.",
+    )
     args = parser.parse_args()
 
     # resolver archivo
@@ -498,7 +601,9 @@ def main():
     matplotlib.rcParams["figure.facecolor"] = "#0d0d0d"
     matplotlib.rcParams["text.color"] = "white"
 
-    if network == "FULL":
+    if args.grid_layout:
+        fig, ani = build_animation_grid(times, vs, ws, meta, args.fps, args.frames, args.skip)
+    elif network == "FULL":
         fig, ani = build_animation_full(times, vs, ws, meta, args.fps, args.frames, args.skip)
     elif network == "RANDOM":
         fig, ani = build_animation_random(times, vs, ws, meta, edges, args.fps, args.frames, args.skip)
